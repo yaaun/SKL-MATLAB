@@ -22,7 +22,7 @@ function varargout = huygens_fresnel(varargin)
 
 % Edit the above text to modify the response to help huygens_fresnel
 
-% Last Modified by GUIDE v2.5 05-Jan-2017 23:05:55
+% Last Modified by GUIDE v2.5 13-Jan-2017 15:40:54
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -119,3 +119,13 @@ function axes1_ButtonDownFcn(hObject, eventdata, handles)
 
 [x, y] = ginput(1);
 disp([x, y]);
+
+
+% --- Executes during object creation, after setting all properties.
+function axes1_CreateFcn(hob, eventdata, handles)
+% hObject    handle to axes1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: place code in OpeningFcn to populate axes1
+
