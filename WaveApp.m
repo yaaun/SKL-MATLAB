@@ -4,14 +4,12 @@ classdef WaveApp < handle
     
     properties (Access = private)
         Sim
-        Iterations
-        
         Sources = []
     end
     
     properties (Access = public)
         UpdateFunc = @(thisobj) 0;
-        FramePause = 1
+        FramePause = 0.2
         Axis
         RunButtonHandle
     end
@@ -28,18 +26,17 @@ classdef WaveApp < handle
             this.Sim = WaveSim(conf.Width, conf.Height);
             disp(this.Sim);
             this.Sim.WaveSpeed = conf.WaveSpeed;
+            this.Sim.WaveLength = conf.WaveLength;
             this.Sim.Iterations = conf.Iterations;
             
             for src = this.Sources
-                this.Sim.setSource(src.Position, src.Amplitude);
+                this.Sim.setSource(src.Position, src.Amplitude, src.Type);
             end
             
         end
         
         
         function start(this)
-
-            
             xmin = -this.Sim.Width / 2;
             xmax = this.Sim.Width / 2;
             ymin = -this.Sim.Height / 2;
@@ -60,6 +57,12 @@ classdef WaveApp < handle
                 colorbar(this.Axis, 'east');
                 pause(this.FramePause);
             end
+        end
+        
+        function reset(this)
+            delete(this.Sim);
+            this.Sources = [];
+            cla(this.Axis);
         end
         
         function mat = WaveMatrix(this)

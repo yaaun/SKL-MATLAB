@@ -22,7 +22,7 @@ function varargout = fale_2d(varargin)
 
 % Edit the above text to modify the response to help fale_2d
 
-% Last Modified by GUIDE v2.5 17-Jan-2017 23:26:11
+% Last Modified by GUIDE v2.5 18-Jan-2017 00:22:22
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -99,6 +99,7 @@ else
     conf = struct(...
         'SourceAmplitude', str2double(handles.amp_edit.String), ...
         'WaveSpeed', str2double(handles.speed_edit.String), ...
+        'WaveLength', str2double(handles.len_edit.String), ...
         'Width', str2double(handles.width_edit.String), ...
         'Height', str2double(handles.height_edit.String), ...
         'Iterations', str2double(handles.iterations_edit.String), ...
@@ -164,15 +165,14 @@ function iterations_edit_Callback(hobj, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of iterations_edit as text
 %        str2double(get(hObject,'String')) returns contents of iterations_edit as a double
-val = str2double(hobj.String);
+v = round(str2double(hobj.String));
 sl = handles.iterations_slider;
 
-if isnan(val) || val < sl.Min || val > sl.Max
-    sl.Value = 10;
-    hobj.String = num2str(sl.Value, '%.1f');
+if v >= sl.Min && v <= sl.Max
+    sl.Value = v;
+    hobj.String = num2str(v, '%.0f');
 else
-    sl.Value = val;
-    hobj.String = num2str(val, '%.1f');
+    hobj.String = num2str(sl.Value, '%.0f');
 end
 
 
@@ -185,7 +185,7 @@ function iterations_slider_Callback(hobj, eventdata, handles)
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 ed = handles.iterations_edit;
-ed.String = num2str(hobj.Value, '%.1f');
+ed.String = num2str(hobj.Value, '%.0f');
 
 % --- Executes during object creation, after setting all properties.
 function iterations_slider_CreateFcn(hObject, eventdata, handles)
@@ -223,14 +223,15 @@ end
 
 
 
-function width_edit_Callback(hObject, eventdata, handles)
+function width_edit_Callback(hobj, eventdata, handles)
 % hObject    handle to width_edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hints: get(hObject,'String') returns contents of width_edit as text
 %        str2double(get(hObject,'String')) returns contents of width_edit as a double
-
+v = round(str2double(hobj.String));
+hobj.String = num2str(v, '%.0f');
 
 % --- Executes during object creation, after setting all properties.
 function width_edit_CreateFcn(hObject, eventdata, handles)
@@ -253,7 +254,8 @@ function height_edit_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of height_edit as text
 %        str2double(get(hObject,'String')) returns contents of height_edit as a double
-
+v = round(str2double(hobj.String));
+hobj.String = num2str(v, '%.0f');
 
 % --- Executes during object creation, after setting all properties.
 function height_edit_CreateFcn(hObject, eventdata, handles)
@@ -290,11 +292,14 @@ function axs_ButtonDownFcn(hobj, eventdata, handles)
 disp(hobj.CurrentPoint);
 
 
-% --- Executes on button press in pushbutton1.
-function pushbutton1_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton1 (see GCBO)
+% --- Executes on button press in reset.
+function reset_Callback(hObject, eventdata, handles)
+% hObject    handle to reset (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+handles.run_toggle.Value = 0;
+handles.run_toggle.String = 'Uruchom';
+handles.App.reset();
 
 
 % --- Executes on button press in togglebutton3.
@@ -337,15 +342,6 @@ function figure1_CreateFcn(hObject, eventdata, handles)
 % handles    empty - handles not created until after all CreateFcns called
 
 
-function app_update_func(app)
-gui = gcf();
-handles = guidata(gui);
-
-axs = handles.axs;
-mat = app.getMatrix();
-contourf(axs, mat);
-
-
 % --- Executes on button press in source_mark_btn.
 function source_mark_btn_Callback(hObject, eventdata, handles)
 % hObject    handle to source_mark_btn (see GCBO)
@@ -381,14 +377,15 @@ end
 
 
 % --- Executes on slider movement.
-function speed_slider_Callback(hObject, eventdata, handles)
+function speed_slider_Callback(hobj, eventdata, handles)
 % hObject    handle to speed_slider (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
-
+ed = handles.speed_edit;
+ed.String = num2str(hobj.Value, '%.1f');
 
 % --- Executes during object creation, after setting all properties.
 function speed_slider_CreateFcn(hObject, eventdata, handles)
@@ -403,14 +400,21 @@ end
 
 
 
-function speed_edit_Callback(hObject, eventdata, handles)
+function speed_edit_Callback(hobj, eventdata, handles)
 % hObject    handle to speed_edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hints: get(hObject,'String') returns contents of speed_edit as text
 %        str2double(get(hObject,'String')) returns contents of speed_edit as a double
+v = str2double(hobj.String);
+sl = handles.speed_slider;
 
+if v >= sl.Min && v <= sl.Max
+    sl.Value = v;
+else
+    hobj.String = num2str(sl.Value, '%.1f');
+end
 
 % --- Executes during object creation, after setting all properties.
 function speed_edit_CreateFcn(hObject, eventdata, handles)
@@ -472,14 +476,22 @@ end
 
 
 
-function fps_edit_Callback(hObject, eventdata, handles)
+function fps_edit_Callback(hobj, eventdata, handles)
 % hObject    handle to fps_edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hints: get(hObject,'String') returns contents of fps_edit as text
 %        str2double(get(hObject,'String')) returns contents of fps_edit as a double
+v = round(str2double(hobj.String));
+sl = handles.fps_slider;
 
+if v >= sl.Min && v <= sl.Max
+    sl.Value = v;
+    hobj.String = num2str(v, '%.0f');
+else
+    hobj.String = num2str(sl.Value, 0);
+end
 
 % --- Executes during object creation, after setting all properties.
 function fps_edit_CreateFcn(hObject, eventdata, handles)
@@ -517,14 +529,15 @@ end
 
 
 % --- Executes on slider movement.
-function len_slider_Callback(hObject, eventdata, handles)
+function len_slider_Callback(hobj, eventdata, handles)
 % hObject    handle to len_slider (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
-
+ed = handles.len_edit;
+ed.String = num2str(hobj.Value, '%.1f');
 
 % --- Executes during object creation, after setting all properties.
 function len_slider_CreateFcn(hObject, eventdata, handles)
@@ -539,13 +552,21 @@ end
 
 
 
-function len_edit_Callback(hObject, eventdata, handles)
+function len_edit_Callback(hobj, eventdata, handles)
 % hObject    handle to len_edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hints: get(hObject,'String') returns contents of len_edit as text
 %        str2double(get(hObject,'String')) returns contents of len_edit as a double
+v = str2double(hobj.String);
+sl = handles.len_slider;
+
+if v >= sl.Min && v <= sl.Max
+    sl.Value = v;
+else
+    hobj.String = num2str(sl.Value, '%.1f');
+end
 
 
 % --- Executes during object creation, after setting all properties.
@@ -559,3 +580,37 @@ function len_edit_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on selection change in type_select.
+function type_select_Callback(hObject, eventdata, handles)
+% hObject    handle to type_select (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns type_select contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from type_select
+
+
+% --- Executes during object creation, after setting all properties.
+function type_select_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to type_select (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes during object creation, after setting all properties.
+function axs_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to axs (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: place code in OpeningFcn to populate axs
+colormap(hObject, 'jet');
+colorbar(hObject, 'east');

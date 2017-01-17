@@ -6,9 +6,11 @@ classdef WaveSim < handle
         Width
         Height
         WaveSpeed = 10
+        WaveLength = 1
         OldMatrix
         Matrix
         Iterations = 10
+        Sources
         
         IterationCount = 0
     end
@@ -22,12 +24,12 @@ classdef WaveSim < handle
             this.OldMatrix = this.Matrix;
         end
         
-        function setSource(this, v, amp)
-           if size(v, 2) == 2
-               this.Matrix(v(2) + this.Height / 2, v(1) + this.Width / 2) = amp;
-           end
+        function setSource(this, v, amp, type)
+            s = struct(...
+                'Pos', v, 'Amp', amp, 'Type', type ...
+            );
            
-           this.OldMatrix = this.Matrix;
+            this.Sources = [this.Sources s];
         end
         
         function step(this)
@@ -39,6 +41,7 @@ classdef WaveSim < handle
             
 
             dt = 1 / this.Iterations;
+            dx = 1;
             
             
             for its = 1 : this.Iterations
@@ -46,20 +49,29 @@ classdef WaveSim < handle
                 curm = this.Matrix;
                 newm = zeros(size(this.Matrix));
                 
+
                 
                 for i = 2 : this.Height
                    for j = 2 : this.Width
-                       r2 = dt;
+                       r2 = dt / dx;
                        newm(i, j) = 2 * curm(i, j) - oldm(i, j) + ...
                            r2 * (curm(i + 1, j) + curm(i, j + 1) + ...
                            curm(i - 1, j) + curm(i, j - 1) + 4 * curm(i, j));
                    end
                 end
                 
-                % Border cells.
-                for i = 1 : 
+                % Set values at source locations.
+                for src = this.Sources
+                   x = src.Pos(1) + this.Width / 2;
+                   y = src.Pos(2) + this.Height / 2;
+                   czestosc = 2 * pi * this.WaveSpeed / this.WaveLength;
+                   
+                   val = src.Amp * sin(czestosc * this.IterationCount / this.Iterations);
+                   
+                   newm(y, x) = val;
+                end
                 
-                this.OldMatrix = this.Matrix;
+                this.OldMatrix = curm;
                 this.Matrix = newm;
                 this.IterationCount = this.IterationCount + 1;
             end
