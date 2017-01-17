@@ -22,7 +22,7 @@ function varargout = fale_2d(varargin)
 
 % Edit the above text to modify the response to help fale_2d
 
-% Last Modified by GUIDE v2.5 17-Jan-2017 00:20:00
+% Last Modified by GUIDE v2.5 17-Jan-2017 01:16:08
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -154,6 +154,7 @@ ydiff = hobj.Position(4) / 2;
 hobj.XLim = [-xdiff , xdiff];
 hobj.YLim = [-ydiff , ydiff];
 
+guidata(hobj, struct());
 
 
 function iterations_edit_Callback(hobj, eventdata, handles)
@@ -265,3 +266,30 @@ function edit5_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in dispersion_check.
+function dispersion_check_Callback(hObject, eventdata, handles)
+% hObject    handle to dispersion_check (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of dispersion_check
+
+
+% --- Executes on mouse press over axes background.
+function axs_ButtonDownFcn(hobj, eventdata, handles)
+% hObject    handle to axs (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+[xs, ys] = ginput(2);
+s = guidata(hobj);
+
+s.ClickCoords = [xs, ys];
+
+
+% --- Executes on button press in pushbutton1.
+function pushbutton1_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
