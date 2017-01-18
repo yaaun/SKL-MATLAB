@@ -22,7 +22,7 @@ function varargout = fale_2d(varargin)
 
 % Edit the above text to modify the response to help fale_2d
 
-% Last Modified by GUIDE v2.5 18-Jan-2017 00:22:22
+% Last Modified by GUIDE v2.5 18-Jan-2017 01:02:00
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -100,11 +100,12 @@ else
         'SourceAmplitude', str2double(handles.amp_edit.String), ...
         'WaveSpeed', str2double(handles.speed_edit.String), ...
         'WaveLength', str2double(handles.len_edit.String), ...
-        'Width', str2double(handles.width_edit.String), ...
-        'Height', str2double(handles.height_edit.String), ...
+        'Width', str2double(handles.dim_edit.String), ...
+        'Height', str2double(handles.dim_edit.String), ...
         'Iterations', str2double(handles.iterations_edit.String), ...
         'AxisHandle', handles.axs, ...
-        'RunButtonHandle', handles.run_toggle ...
+        'RunButtonHandle', handles.run_toggle, ...
+        'FramesPerSecond', str2double(handles.fps_edit.String) ...
     );
     
     
@@ -223,19 +224,19 @@ end
 
 
 
-function width_edit_Callback(hobj, eventdata, handles)
-% hObject    handle to width_edit (see GCBO)
+function dim_edit_Callback(hobj, eventdata, handles)
+% hObject    handle to dim_edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of width_edit as text
-%        str2double(get(hObject,'String')) returns contents of width_edit as a double
+% Hints: get(hObject,'String') returns contents of dim_edit as text
+%        str2double(get(hObject,'String')) returns contents of dim_edit as a double
 v = round(str2double(hobj.String));
 hobj.String = num2str(v, '%.0f');
 
 % --- Executes during object creation, after setting all properties.
-function width_edit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to width_edit (see GCBO)
+function dim_edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to dim_edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -300,6 +301,12 @@ function reset_Callback(hObject, eventdata, handles)
 handles.run_toggle.Value = 0;
 handles.run_toggle.String = 'Uruchom';
 handles.App.reset();
+
+w = round(str2double(handles.dim_edit.String));
+
+handles.axs.XLim = [-w / 2 , w / 2];
+handles.axs.YLim = [-w / 2 , w / 2];
+
 
 
 % --- Executes on button press in togglebutton3.
@@ -613,4 +620,3 @@ function axs_CreateFcn(hObject, eventdata, handles)
 
 % Hint: place code in OpeningFcn to populate axs
 colormap(hObject, 'jet');
-colorbar(hObject, 'east');

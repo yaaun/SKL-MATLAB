@@ -22,6 +22,7 @@ classdef WaveApp < handle
         function configure(this, conf)
             this.Axis = conf.AxisHandle;
             this.RunButtonHandle = conf.RunButtonHandle;
+            this.FramePause = 1 / conf.FramesPerSecond;
             
             this.Sim = WaveSim(conf.Width, conf.Height);
             disp(this.Sim);
@@ -50,11 +51,16 @@ classdef WaveApp < handle
                 
                 surf(this.Axis, aX, aY, this.Sim.getMatrix(), 'EdgeColor', 'none');
                 view(this.Axis, 2);
-                this.Axis.CLim = [-1 , 1];
+                %this.Axis.CLim = [-100 , 100]
                 this.Axis.FontSize = 8;
-
+ 
                 colormap(this.Axis, 'jet');
+
+                %mat = this.Sim.getMatrix();
+                %imagesc(mat, [-1 , 1]);
+                %colormap(this.Axis, 'jet');
                 colorbar(this.Axis, 'east');
+                
                 pause(this.FramePause);
             end
         end
